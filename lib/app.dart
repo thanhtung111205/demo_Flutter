@@ -1,78 +1,48 @@
+// ============================================================
+// APP ROOT – MaterialApp Configuration
+// ============================================================
+// Cấu hình root widget của Smart Note Pro:
+//  • Material Design 3 (useMaterial3: true) – đã bật trong theme
+//  • Light + Dark theme tự động theo hệ thống
+//  • Không có debug banner
+//  • Home → HomeScreen
+// ============================================================
+
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'utils/app_theme.dart';
+import 'utils/constants.dart';
 
-class StudentManagerApp extends StatefulWidget {
-  const StudentManagerApp({super.key});
-
-  @override
-  State<StudentManagerApp> createState() => _StudentManagerAppState();
-}
-
-class _StudentManagerAppState extends State<StudentManagerApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTheme();
-  }
-
-  Future<void> _loadTheme() async {
-    try {
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/settings.json');
-      if (await file.exists()) {
-        final jsonString = await file.readAsString();
-        final data = jsonDecode(jsonString) as Map<String, dynamic>;
-        if (data.containsKey('isDark')) {
-          setState(() {
-            _themeMode = data['isDark'] == true ? ThemeMode.dark : ThemeMode.light;
-          });
-        }
-      }
-    } catch (_) {}
-  }
-
-  Future<void> _saveTheme(bool isDark) async {
-    try {
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/settings.json');
-      await file.writeAsString(jsonEncode({'isDark': isDark}));
-    } catch (_) {}
-  }
-
-  void _toggleTheme() {
-    setState(() {
-      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
-    });
-    _saveTheme(_themeMode == ThemeMode.dark);
-  }
+/// Root widget của Smart Note Pro
+class SmartNoteProApp extends StatelessWidget {
+  const SmartNoteProApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Quản Lý Ứng Dụng',
+      // ── Metadata ──
+      title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
-      themeMode: _themeMode,
-      home: HomeScreen(
-        themeMode: _themeMode,
-        onToggleTheme: _toggleTheme,
+
+      // ── Theme (Material 3) ──
+      theme: AppTheme.lightTheme, // Light mode
+      darkTheme: AppTheme.darkTheme, // Dark mode
+      themeMode: ThemeMode.system, // Tự động theo cài đặt thiết bị
+
+      // ── Entry point ──
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          final user = snapshot.data;
+          if (user == null) return const LoginScreen();
+          return const HomeScreen();
+        },
       ),
     );
   }
