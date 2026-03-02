@@ -9,8 +9,10 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
 
@@ -26,12 +28,22 @@ class SmartNoteProApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ── Theme (Material 3) ──
-      theme: AppTheme.lightTheme,       // Light mode
-      darkTheme: AppTheme.darkTheme,    // Dark mode
-      themeMode: ThemeMode.system,      // Tự động theo cài đặt thiết bị
+      theme: AppTheme.lightTheme, // Light mode
+      darkTheme: AppTheme.darkTheme, // Dark mode
+      themeMode: ThemeMode.system, // Tự động theo cài đặt thiết bị
 
       // ── Entry point ──
-      home: const HomeScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          final user = snapshot.data;
+          if (user == null) return const LoginScreen();
+          return const HomeScreen();
+        },
+      ),
     );
   }
 }

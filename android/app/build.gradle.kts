@@ -5,6 +5,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Apply Google services plugin for Firebase (requires classpath in root build.gradle.kts)
+apply(plugin = "com.google.gms.google-services")
+
 android {
     namespace = "com.example.baisimplenote"
     compileSdk = flutter.compileSdkVersion

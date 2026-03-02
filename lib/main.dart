@@ -8,12 +8,14 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'app.dart';
+import 'screens/login_screen.dart';
+import 'services/auth_service.dart';
 
-void main() {
-  // Khoi tao Flutter engine bindings truoc khi dung plugin
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   runApp(const SmartNoteProApp());
 }
