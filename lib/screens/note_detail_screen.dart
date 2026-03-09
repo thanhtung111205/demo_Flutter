@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 import '../utils/constants.dart';
 import '../utils/date_formatter.dart';
+import '../utils/image_utils.dart';
 import 'add_edit_note_screen.dart';
 
 class NoteDetailScreen extends StatelessWidget {
@@ -135,11 +136,11 @@ class NoteDetailScreen extends StatelessWidget {
               const SizedBox(height: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
-                child: Image.file(
-                  File(note.imagePath!),
+                child: imageFromPath(
+                  note.imagePath!,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (ctx, e, _) => _brokenPlaceholder(cs),
+                  errorPlaceholder: _brokenPlaceholder(cs),
                 ),
               ),
             ],
@@ -165,11 +166,11 @@ class NoteDetailScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: Image.file(
-                    File(note.drawingPath!),
+                  child: imageFromPath(
+                    note.drawingPath!,
                     width: double.infinity,
                     fit: BoxFit.contain,
-                    errorBuilder: (ctx, e, _) => _brokenPlaceholder(cs),
+                    errorPlaceholder: _brokenPlaceholder(cs),
                   ),
                 ),
               ),
