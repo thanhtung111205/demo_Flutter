@@ -13,8 +13,10 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/note_model.dart';
+import '../services/auth_service.dart';
 import '../services/file_service.dart';
 import '../services/note_service.dart';
 import '../utils/constants.dart';
@@ -84,6 +86,37 @@ class _HomeScreenState extends State<HomeScreen>
       _isLoading = false;
     });
     _fabCtrl.forward();
+  }
+
+  // ────────────────────────────────────────────
+  // LOGOUT
+  // ────────────────────────────────────────────
+
+  Future<void> _handleLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    await AuthService.signOut();
+    if (mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    }
   }
 
   // ────────────────────────────────────────────
@@ -360,7 +393,8 @@ class _HomeScreenState extends State<HomeScreen>
 
       // ── AppBar ──
       appBar: AppBar(
-        backgroundColor: cs.surface,
+        backgroundColor: cs.surfaceContainer,
+        elevation: 2,
         title: _isSearching
             ? TextField(
                 controller: _searchCtrl,
@@ -386,18 +420,22 @@ class _HomeScreenState extends State<HomeScreen>
                       letterSpacing: -0.5,
                     ),
                   ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      _isLoading
-                          ? 'Loading…'
-                          : _notes.isEmpty
-                              ? 'Start writing!'
-                              : '${_notes.length} note${_notes.length > 1 ? 's' : ''}',
-                      key: ValueKey(_notes.length),
-                      style: tt.labelSmall
-                          ?.copyWith(color: cs.onSurfaceVariant),
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.check_circle, size: 14, color: cs.tertiary),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          FirebaseAuth.instance.currentUser?.email ?? 'Guest',
+                          style: tt.labelSmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -418,6 +456,28 @@ class _HomeScreenState extends State<HomeScreen>
               tooltip: 'Search notes',
               onPressed: () => setState(() => _isSearching = true),
             ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'logout') {
+                _handleLogout();
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout_rounded, size: 20, color: cs.error),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Sign Out',
+                      style: TextStyle(color: cs.error),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(width: 4),
         ],
       ),

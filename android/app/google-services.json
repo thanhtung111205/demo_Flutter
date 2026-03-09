@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1089918227948",
+    "project_id": "demoflutter-ac10b",
+    "storage_bucket": "demoflutter-ac10b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089918227948:android:5484d283ba73213f995cc9",
+        "android_client_info": {
+          "package_name": "com.example.baisimplenote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089918227948-sp822r7t3b37n75rdmdnnlj4ugahieel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.baisimplenote",
+            "certificate_hash": "e79f7094b141a92f08f48330bde227c809402d58"
+          }
+        },
+        {
+          "client_id": "1089918227948-rt96l4qud486hjoulrqk0dn2muntjga4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrkt2x2gm43hmIFg54tXxyJt9VaDhbeys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089918227948-rt96l4qud486hjoulrqk0dn2muntjga4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1089918227948-i0gqh764ok5fho2rjs8dble25lb0ia69.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.baisimplenote"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
