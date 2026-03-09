@@ -23,6 +23,9 @@
     <!-- Đọc ảnh từ media store – Android 13+ -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <!-- Network access for uploads / Firestore / HTTP requests -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Đọc storage – Android 10–12 (không cần trên 13+) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"

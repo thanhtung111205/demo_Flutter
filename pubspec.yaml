@@ -46,6 +46,8 @@ dependencies:
   cloud_firestore: ^4.11.0
   firebase_analytics: ^10.1.0
   google_sign_in: ^6.1.0
+  # HTTP client for Cloudinary uploads
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:

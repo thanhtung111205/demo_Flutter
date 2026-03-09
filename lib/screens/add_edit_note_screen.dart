@@ -23,7 +23,10 @@ import 'package:uuid/uuid.dart';
 
 import '../models/note_model.dart';
 import '../services/file_service.dart';
+import '../services/cloudinary_service.dart';
+import '../utils/cloudinary_config.dart';
 import '../utils/constants.dart';
+import '../utils/image_utils.dart';
 import 'draw_note_screen.dart';
 
 class AddEditNoteScreen extends StatefulWidget {
@@ -41,6 +44,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
   final _fileService = FileService();
+  late final CloudinaryService _cloudinary;
 
   // Attachment state
   String? _imagePath;
@@ -55,6 +59,10 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   @override
   void initState() {
     super.initState();
+    _cloudinary = CloudinaryService(
+      cloudName: CloudinaryConfig.cloudName,
+      uploadPreset: CloudinaryConfig.uploadPreset,
+    );
     // Điền dữ liệu nếu là Edit mode
     if (_isEditMode) {
       final n = widget.note!;
@@ -81,19 +89,48 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   Future<void> _pickImage() async {
     final path = await _fileService.pickImage();
     if (!mounted) return;
-    if (path != null) {
+    if (path == null) return;
+
+    // Upload to Cloudinary and store URL
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading image...')));
+      final url = await _cloudinary.uploadFile(File(path));
+      if (!mounted) return;
+      setState(() => _imagePath = url);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Image uploaded')));
+    } catch (e) {
+      // Fallback to local path if upload fails
+      if (!mounted) return;
       setState(() => _imagePath = path);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     }
   }
 
   Future<void> _pickFile() async {
     final result = await _fileService.pickFile();
     if (!mounted) return;
-    if (result != null) {
+    if (result == null) return;
+
+    final path = result['path'] as String?;
+    final name = result['name'] as String?;
+    if (path == null) return;
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading file...')));
+      final url = await _cloudinary.uploadFile(File(path));
+      if (!mounted) return;
       setState(() {
-        _filePath = result['path'];
-        _fileName = result['name'];
+        _filePath = url;
+        _fileName = name ?? url.split('/').last;
       });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('File uploaded')));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _filePath = path;
+        _fileName = name;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     }
   }
 
@@ -278,29 +315,28 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
 
             // ── Image preview ──
             if (_imagePath != null)
-              _PreviewCard(
-                child: Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(_imagePath!),
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        errorBuilder: (ctx, e, _) =>
-                            _broken(cs, 'Image not found'),
+                      _PreviewCard(
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: imageFromPath(
+                                _imagePath!,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                errorPlaceholder: _broken(cs, 'Image not found'),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: _RemoveBtn(
+                                  onTap: () => setState(() => _imagePath = null)),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: _RemoveBtn(
-                          onTap: () => setState(() => _imagePath = null)),
-                    ),
-                  ],
-                ),
-              ),
 
             // ── Drawing preview ──
             if (_drawingPath != null)
@@ -313,12 +349,11 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
                       child: Container(
                         color: Colors.white,
                         width: double.infinity,
-                        child: Image.file(
-                          File(_drawingPath!),
+                        child: imageFromPath(
+                          _drawingPath!,
                           height: 180,
                           fit: BoxFit.contain,
-                          errorBuilder: (ctx, e, _) =>
-                              _broken(cs, 'Drawing not found'),
+                          errorPlaceholder: _broken(cs, 'Drawing not found'),
                         ),
                       ),
                     ),

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 import '../utils/constants.dart';
 import '../utils/date_formatter.dart';
+import '../utils/image_utils.dart';
 
 /// Card hiển thị thông tin tóm tắt của một Note
 class NoteCard extends StatelessWidget {
@@ -94,13 +95,12 @@ class NoteCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    File(note.imagePath!),
+                  child: imageFromPath(
+                    note.imagePath!,
                     height: 90,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    // Graceful fallback nếu file bị xóa
-                    errorBuilder: (ctx, e, _) => Container(
+                    errorPlaceholder: Container(
                       height: 90,
                       color: cs.surfaceContainerHighest,
                       child: Center(
@@ -120,10 +120,10 @@ class NoteCard extends StatelessWidget {
                     height: 72,
                     width: double.infinity,
                     color: Colors.white,
-                    child: Image.file(
-                      File(note.drawingPath!),
+                    child: imageFromPath(
+                      note.drawingPath!,
                       fit: BoxFit.contain,
-                      errorBuilder: (ctx, e, _) => _AttachBadge(
+                      errorPlaceholder: _AttachBadge(
                         icon: Icons.gesture_rounded,
                         label: 'Drawing attached',
                         cs: cs,
