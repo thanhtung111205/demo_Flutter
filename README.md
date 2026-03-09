@@ -2,7 +2,8 @@
 
 > **Flutter  Material Design 3  Clean Architecture  Production Ready**
 
-Ứng dụng ghi chú thông minh với thiết kế hiện đại, hỗ trợ ảnh, tài liệu và vẽ tay.
+Ứng dụng ghi chú thông minh với thiết kế hiện đại, hỗ trợ ảnh, tài liệu và vẽ tay. 
+Tác giả: Giang Thanh Tùng
 
 ---
 
