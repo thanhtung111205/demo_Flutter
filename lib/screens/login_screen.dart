@@ -51,7 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ),
                 FilledButton.icon(
-                  icon: _loading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : Image.asset('assets/google_logo.png', width: 20, height: 20),
+                  icon: _loading
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.login),
                   label: Text(_loading ? 'Signing in…' : 'Sign in with Google'),
                   onPressed: _loading ? null : _handleGoogleSignIn,
                 ),

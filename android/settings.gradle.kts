@@ -20,6 +20,9 @@ pluginManagement {
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "8.9.1" apply false
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services") version("4.3.15") apply false
+    // END: FlutterFire Configuration
     // Kotlin 2.1.10 = latest stable release.
     // 2.2.x is pre-release and triggers InMemoryStorage.close crash.
     id("org.jetbrains.kotlin.android") version "2.1.10" apply false
